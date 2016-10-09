@@ -25,6 +25,8 @@ config.__Registered_DatasetTypes__.append('LocMetadata')
 from bstore import parsers, database
 from pathlib import Path
 
+import bsplugins.leb as leb
+
 testDataRoot = Path(config.__Path_To_Test_Data__)
 
 def test_MMParser_ParseGenericFile():
@@ -34,7 +36,7 @@ def test_MMParser_ParseGenericFile():
     inputFilename   = 'Cos7_Microtubules_A647_3_MMStack_Pos0_locResults.dat'
     datasetType     = 'TestType'
     
-    mmParser = parsers.MMParser()
+    mmParser = leb.MMParser()
     mmParser.parseFilename(inputFilename, datasetType)
     assert_equal(mmParser.dataset.datasetIDs['acqID'],                    3)
     assert_equal(mmParser.dataset.datasetIDs['channelID'],           'A647')
@@ -50,7 +52,7 @@ def test_MMParser_UnregisteredType_WillNot_Parse():
     inputFilename   = 'Cos7_Microtubules_A647_3_MMStack_Pos0_locResults.dat'
     datasetType     = 'Localizations_Cool'
     
-    mmParser = parsers.MMParser()
+    mmParser = leb.MMParser()
     mmParser.parseFilename(inputFilename, datasetType)
  
 def test_MMParser_Channel_Underscores():
@@ -66,7 +68,7 @@ def test_MMParser_Channel_Underscores():
                      'Cos7___Microtubules__Cy5_3_MMStack_Pos0_locResults.dat']
     datasetType   = 'TestType'
     
-    mmParser = parsers.MMParser()
+    mmParser = leb.MMParser()
     for currFilename in inputFilename:
         mmParser.parseFilename(currFilename, datasetType)
         assert_equal(mmParser.dataset.datasetIDs['acqID'],                   3)
@@ -82,7 +84,7 @@ def test_MMParser_Attributes_NoChannel():
     inputFilename   = 'Cos7_Microtubules_12_MMStack_Pos1_locResults.dat'
     datasetType     = 'TestType'
     
-    mmParser = parsers.MMParser()
+    mmParser = leb.MMParser()
     mmParser.parseFilename(inputFilename, datasetType)
     assert_equal(mmParser.dataset.datasetIDs['acqID'],                      12)
     assert_equal(mmParser.dataset.datasetIDs['posID'],                    (1,))
@@ -97,7 +99,7 @@ def test_MMParser_Attributes_NoPosition():
     inputFilename   = 'Cos7_Microtubules_12_MMStack_locResults.dat'
     datasetType     = 'TestType'
     
-    mmParser = parsers.MMParser()
+    mmParser = leb.MMParser()
     mmParser.parseFilename(inputFilename, datasetType)
     assert_equal(mmParser.dataset.datasetIDs['acqID'],                      12)
     assert_equal(mmParser.dataset.datasetIDs['posID'],                    None)
@@ -112,7 +114,7 @@ def test_MMParser_Attributes_MultipleXY():
     inputFilename   = 'HeLa_Actin_4_MMStack_1-Pos_012_003_locResults.dat'
     datasetType     = 'TestType'
     
-    mmParser = parsers.MMParser()
+    mmParser = leb.MMParser()
     mmParser.parseFilename(inputFilename, datasetType)
     assert_equal(mmParser.dataset.datasetIDs['acqID'],             4)
     assert_equal(mmParser.dataset.datasetIDs['channelID'],      None)
@@ -129,7 +131,7 @@ def test_MMParser_Path_Input():
         Path('results/Cos7_Microtubules_A750_3_MMStack_Pos0_locResults.dat')
     datasetType = 'TestType'
     
-    mmParser = parsers.MMParser()
+    mmParser = leb.MMParser()
     mmParser.parseFilename(inputFile, datasetType)
     assert_equal(mmParser.dataset.datasetIDs['acqID'],                       3)
     assert_equal(mmParser.dataset.datasetIDs['channelID'],              'A750')
@@ -154,7 +156,7 @@ def test_MMParser_Widefield_Attributes():
         'HeLa_WF__13_Control_A647_MMStack_Pos0.ome.tif'
     ]    
     
-    mmParser = parsers.MMParser()
+    mmParser = leb.MMParser()
     for filename in f:
         mmParser.parseFilename(filename, 'WidefieldImage')
         assert_equal(mmParser.dataset.datasetIDs['acqID'],                  13)
@@ -180,7 +182,7 @@ def test_MMParser_Widefield_NoChannel():
         'HeLa_WF__13_Control_MMStack_Pos0.ome.tif'
     ]    
     
-    mmParser = parsers.MMParser()
+    mmParser = leb.MMParser()
     for filename in f:
         mmParser.parseFilename(filename, 'WidefieldImage')
         assert_equal(mmParser.dataset.datasetIDs['acqID'],                  13)
@@ -196,7 +198,7 @@ def test_MMParser_Widefield_Bizarre_Underscores():
     """
     filename = '__HeLa_Control__FISH___WF__173_MMStack_Pos0.ome.tif'
     
-    mmParser = parsers.MMParser()
+    mmParser = leb.MMParser()
     mmParser.parseFilename(filename, 'WidefieldImage')
     assert_equal(mmParser.dataset.datasetIDs['acqID'],                     173)
     assert_equal(mmParser.dataset.datasetIDs['channelID'],                None)
@@ -213,7 +215,7 @@ def test_MMParser_Dataset():
     inputFile = testDataRoot / Path('parsers_test_files') / Path(f)
     datasetType = 'LocMetadata'
     
-    mmParser = parsers.MMParser()
+    mmParser = leb.MMParser()
     mmParser.parseFilename(inputFile, datasetType)
     ds = mmParser.dataset
     
@@ -237,7 +239,7 @@ def test_MMParser_Uninitialized():
     """Will MMParser throw an error when prematurely accessing the dataset?
     
     """
-    mmParser = parsers.MMParser()
+    mmParser = leb.MMParser()
     mmParser.dataset
  
 @raises(parsers.ParserNotInitializedError)    
@@ -249,7 +251,7 @@ def test_MMParser_Uninitialized_After_Use():
     inputFile   = testDataRoot / Path('parsers_test_files') / Path(f)
     datasetType = 'LocMetadata'
     
-    mmParser = parsers.MMParser()
+    mmParser = leb.MMParser()
     mmParser.parseFilename(inputFile, datasetType)
     mmParser.dataset
     
@@ -266,7 +268,7 @@ def test_MMParser_Widefield_Data():
                                / Path('Cos7_A647_WF1/') / Path(f)
     datasetType = 'WidefieldImage'
     
-    mmParser = parsers.MMParser()
+    mmParser = leb.MMParser()
     mmParser.parseFilename(inputFile, datasetType)
     
     ds      = mmParser.dataset   
@@ -281,7 +283,7 @@ def test_MMParser_ConvertsSpacesToUnderscores():
     # Note the space in prefix!
     f = 'my dataset_A647_1_MMStack_Pos0_locResults.dat'    
     
-    parser = parsers.MMParser()
+    parser = leb.MMParser()
     parser.parseFilename(f, 'TestType')
     assert_equal(parser.dataset.datasetIDs['acqID'],                  1)
     assert_equal(parser.dataset.datasetIDs['channelID'],         'A647')
@@ -298,5 +300,5 @@ def test_MMParser_ParseFailure():
     """
     f = 'blablabla 214'
     
-    parser = parsers.MMParser()
+    parser = leb.MMParser()
     parser.parseFilename(f, 'TestType')
