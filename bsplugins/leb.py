@@ -139,7 +139,14 @@ class MMParser(pr.Parser):
                                                                   datasetType))
         dType = getattr(mod, datasetType)
             
-        self.dataset = dType(datasetIDs = idDict)           
+        self.dataset = dType(datasetIDs = idDict)
+
+        try:
+            self.dataset.data = self.dataset.readFromFile(
+                                                 self._fullPath, **kwargs)
+        except:
+            warnings.warn('Warning: Filename successfully parsed, but no data '
+                          'was read from the file.')
             
         # Parser is now set and initialized.
         self.initialized = True
