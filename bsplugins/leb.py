@@ -133,6 +133,9 @@ class MMParser(pr.Parser):
         dType = getattr(mod, datasetType)
             
         self.dataset = dType(datasetIDs = idDict)
+        
+        # Parser is now set and initialized.
+        self.initialized = True
 
         try:
             self.dataset.data = self.dataset.readFromFile(
@@ -140,9 +143,6 @@ class MMParser(pr.Parser):
         except:
             warnings.warn('Warning: Filename successfully parsed, but no data '
                           'was read from the file.')
-            
-        # Parser is now set and initialized.
-        self.initialized = True
         
     def _parse(self, filename, extractAcqID = True):
         """Parse a generic file, i.e. one not requiring special treatment.
