@@ -10,13 +10,6 @@ import pathlib, sys, importlib, re, warnings
 
 class MMParser(pr.Parser):
     """Parses a LEB Micro-Manager-based file for the acquisition info.
-    
-    Parameters
-    ----------
-    readTiffTags : bool
-        Determines whether Tiff tags are read in addition to the image data.
-        This may cause problems if set to true and the image is not a Tiff file
-        whose format is supported by tifffile.
         
     References
     ----------
