@@ -78,7 +78,9 @@ class MMParser(pr.Parser):
     def requiresConfig(self):
         return False
 
-    def parseFilename(self, filename, datasetType = 'LocResults', **kwargs):
+    def parseFilename(
+            self, filename, datasetType = 'Localizations',
+            readData=True, **kwargs):
         """Parse the filename to extract the acquisition information.
         
         Running this method will reset the parser to an uninitialized state
@@ -90,6 +92,8 @@ class MMParser(pr.Parser):
             A string or pathlib Path object containing the dataset's filename.
         datasetType     : str
             One of the registered datasetTypes.
+        readData        : bool
+            Determines whether data will be read from the file.
             
         """
         # Reset the parser
@@ -141,8 +145,11 @@ class MMParser(pr.Parser):
         self.initialized = True
 
         try:
-            self.dataset.data = self.dataset.readFromFile(
-                                                 self._fullPath, **kwargs)
+            if readData:
+                self.dataset.data = self.dataset.readFromFile(
+                                        self._fullPath, **kwargs)
+            else:
+                self.dataset.data = None
         except:
             warnings.warn('Warning: Filename successfully parsed, but no data '
                           'was read from the file.')
