@@ -302,3 +302,22 @@ def test_MMParser_ParseFailure():
     
     parser = leb.MMParser()
     parser.parseFilename(f, 'TestType')
+    
+def test_MMParser_Do_Not_Read_Data():
+    """Filenames can be parsed without reading data from the file.
+    
+    """
+    inputFilename   = 'HeLa_Actin_4_MMStack_1_Pos0_Localizations.csv'
+    datasetType     = 'Localizations'
+    
+    mmParser = leb.MMParser()
+    mmParser.parseFilename(inputFilename, datasetType, readData = False)
+    assert_equal(mmParser.dataset.datasetIDs['acqID'],             4)
+    assert_equal(mmParser.dataset.datasetIDs['channelID'],      None)
+    assert_equal(mmParser.dataset.datasetIDs['posID'],          (0,))
+    assert_equal(mmParser.dataset.datasetIDs['prefix'], 'HeLa_Actin')
+    assert_equal(mmParser.dataset.datasetIDs['sliceID'],        None)
+    assert_equal(mmParser.dataset.datasetType,       'Localizations')
+    
+    assert(mmParser.dataset.data is None)
+    
