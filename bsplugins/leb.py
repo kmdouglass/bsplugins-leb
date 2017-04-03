@@ -121,9 +121,6 @@ class MMParser(pr.Parser):
             # Do parsing for particular types here
             if datasetType   == 'WidefieldImage':
                 parsedData = self._parseWidefieldImage(filename)
-            # XXX: Hotfix for Micro-Manager naming convention...
-            elif datasetType == 'Localizations':
-                parsedData = self._parseLocalizations(filename)
             else:
                 parsedData = self._parse(filename)
         except:
@@ -186,88 +183,8 @@ class MMParser(pr.Parser):
         # Obtain the acquisition ID
         prefixRawParts = prefixRaw.split('_')
         if extractAcqID:
-            acqID          = int(prefixRawParts[-1])
-            prefix    = '_'.join(prefixRawParts[:-1])
-        else:
-            # This must be set elsewhere, such as by a widefield image
-            # tag. Not setting it results in an error when instantiating
-            # a Dataset instance.
-            acqID  = None
-            
-            # Cannot simply use prefixRaw because spurious underscores
-            # will survive through into prefix
-            prefix = '_'.join(prefixRawParts)
-        
-        # Obtain the channel ID and prefix
-        # Extract any channel identifiers if present using
-        # channelIdentifer dict
-        prefix    = re.sub(r'\_\_+', '_', prefix) # Remove repeats of '_'
-        channelID = [channel for channel in self.channelIdentifier.keys()
-                     if channel in prefix]
-        assert (len(channelID) <= 1), channelID
-        try:
-            channelID       = channelID[0]
-            channelIDString = re.search(r'((\_' + channelID +              \
-                                            ')\_?$)|((^\_)?' + channelID + \
-                                            '(\_)?)',
-                                        prefix)
-            prefix = prefix.replace(channelIDString.group(), '')
-        except IndexError:
-            # When there is no channel identifier found, set it to None
-            channelID = None
-    
-        # Obtain the position ID using regular expressions
-        # First, extract strings like 'Pos0' or 'Pos_003_002
-        positionRaw = re.search(r'Pos\_\d{1,3}\_\d{1,3}|Pos\d{1,}', suffixRaw)
-        if positionRaw == None:
-            posID = None
-        else:
-            # Next, extract the digits and convert them to a tuple
-            indexes = re.findall(r'\d{1,}', positionRaw.group(0))
-            posID   = tuple([int(index) for index in indexes])
-             
-        # These are not currently implemented by the MMParser
-        sliceID = None
-        dateID  = None
-        
-        # PyTables has problems with spaces in the name
-        prefix = prefix.replace(' ', '_')        
-        
-        return prefix, acqID, channelID, dateID, posID, sliceID
-    
-    def _parseLocalizations(self, filename, extractAcqID = True):
-        """Hotfix to work with MM acquisition naming behavior.
-        
-        Parameters
-        ----------
-        filename     : str
-            The filename for the current file to parse.
-        extractAcqID : bool
-            Should an acquisition ID be extracted from the filename? This
-            is useful for widefield images because they will not contain
-            an acquisition ID that is automatically inserted into the
-            filename.
-            
-        Returns
-        -------
-        prefix    : str
-        acqID     : int
-        channelID : str
-        dateID    : str
-        posID     : (int,) or (int, int)
-        sliceID   : int
-        
-        """
-        # Remove any leading underscores
-        filename = filename.lstrip('_')        
-        
-        # Split the string at 'MMStack'
-        prefixRaw, suffixRaw = filename.split('_MMStack_')         
-            
-        # Obtain the acquisition ID
-        prefixRawParts = prefixRaw.split('_')
-        if extractAcqID:
-            acqID     = int(prefixRawParts[-2])
+            # XXX: Hotfix for MM2 naming bug; both indexes are usually 1
+            acqID          = int(prefixRawParts[-2])
             prefix    = '_'.join(prefixRawParts[:-2])
         else:
             # This must be set elsewhere, such as by a widefield image
